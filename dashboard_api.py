@@ -187,10 +187,9 @@ if len(pred_client)==0:
 
 
 ### résultat du prédiction via requests API
-url = 'http://localhost:4000/predict/'+str(var_code)
+#url = 'http://localhost:4000/predict/'+str(var_code)
 ### résultat du prédiction via heroku
-#url = 'https://api-p7-oc.herokuapp.com/predict/'+str(var_code)
-
+url = 'https://api-p7-oc.herokuapp.com/predict/'+str(var_code)
 #st.write(url)
 response = requests.get(url)
 result = response.json()
