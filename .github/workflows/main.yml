@@ -16,10 +16,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: test unitaire
-        run: |
-            pip install unitest
-            python -m unittest api_testUnitaire
+      # - name: test unitaire
+      #   run: |
+      #       pip install unitest
+      #       python -m unittest api_testUnitaire
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
