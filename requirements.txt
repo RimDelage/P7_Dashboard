@@ -6,7 +6,7 @@ seaborn==0.11.2
 matplotlib==3.5.2
 shap==0.41.0
 streamlit==1.16.0
-imblearn=0.0
+imblearn
 sklearn==1.1.3
 lightgbm==3.3.5
 plotly==5.9.0
