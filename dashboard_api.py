@@ -222,142 +222,142 @@ st.write(risk)
 
 
 
-#
-# ### Affichage Crédit accepté/refusé
-# texte = " <span style='color:black;font-size:20px;'>Loan for client ID :  </span> " + str(SK_ID_CURR)
-# if int(risk) > Threshold*100:
-#     texte = texte + "  ┅┅➤ <span style='color:red;font-size:20px;'> ❌ REFUSED  </span>"
-#     st.write(texte,unsafe_allow_html=True)
-# else:
-#     texte = texte + "  ┅┅➤ <span style='color:green;font-size:20px;'> ✅ APPROVED </span>"
-#     st.write(texte,unsafe_allow_html=True)
-#
-# ### Affichage gauge de score de risque
-# fig = go.Figure(go.Indicator(
-#     domain = {'x': [0, 1], 'y': [0, 1]},
-#     value = y_pred_proba_1,#y_pred_proba[0][1],
-#     mode = "gauge+number+delta",
-#     title = {'text': "Risk of Failure",'font': {'size': 30}},
-#     delta = {'reference': Threshold,
-#              'increasing':{'color':'red'},
-#              'decreasing':{'color':'green'}},
-#     gauge = {'axis': {'range': [None, 1]},
-#              'bar':{'color': "black"},
-#              'steps' : [
-#                  {'range': [0, Threshold], 'color': "green"},
-#                  {'range': [Threshold, 1], 'color': "red"}],
-#              'threshold' : {'line': {'color': "black", 'width': 4}, 'thickness': 0.75, 'value': Threshold}}))
-#
-# st.plotly_chart(fig, use_container_width=True)
+
+### Affichage Crédit accepté/refusé
+texte = " <span style='color:black;font-size:20px;'>Loan for client ID :  </span> " + str(SK_ID_CURR)
+if int(risk) > Threshold*100:
+    texte = texte + "  ┅┅➤ <span style='color:red;font-size:20px;'> ❌ REFUSED  </span>"
+    st.write(texte,unsafe_allow_html=True)
+else:
+    texte = texte + "  ┅┅➤ <span style='color:green;font-size:20px;'> ✅ APPROVED </span>"
+    st.write(texte,unsafe_allow_html=True)
+
+### Affichage gauge de score de risque
+fig = go.Figure(go.Indicator(
+    domain = {'x': [0, 1], 'y': [0, 1]},
+    value = y_pred_proba_1,#y_pred_proba[0][1],
+    mode = "gauge+number+delta",
+    title = {'text': "Risk of Failure",'font': {'size': 30}},
+    delta = {'reference': Threshold,
+             'increasing':{'color':'red'},
+             'decreasing':{'color':'green'}},
+    gauge = {'axis': {'range': [None, 1]},
+             'bar':{'color': "black"},
+             'steps' : [
+                 {'range': [0, Threshold], 'color': "green"},
+                 {'range': [Threshold, 1], 'color': "red"}],
+             'threshold' : {'line': {'color': "black", 'width': 4}, 'thickness': 0.75, 'value': Threshold}}))
+
+st.plotly_chart(fig, use_container_width=True)
+##########################################################################################################################
+
+
+
+# ##########################################################################################################################
+# ###                  Affichage des informations détaillée du client sélectionné                                        ###
+# ##########################################################################################################################
+# with st.expander("Detailed customer information :", expanded=False):
+#     st.write("Here you can see the detailed information of the customer " + var_code)
+#     st.write(pred_client.iloc[:,2:].T)
 # ##########################################################################################################################
 #
+
+
+##########################################################################################################################
+###                                                       Analyse shapely                                              ###
+##########################################################################################################################
+df_clients_shap=df_clients.copy()
+df_clients_shap.set_index('SK_ID_CURR', inplace = True)
+df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
+#st.write(df_clients_shap.head(2))
+### récupération des shap_values de notre échantillon
+shap_values = explainer(df_clients_shap)
+
+
+
+###....................................... Analyse shapely locale
+### index de l'ID client renseigné
+idx_clients_shap = df_clients_shap.index.get_loc(int(var_code))
+colors = ['green','red']
+#st.write(idx_clients_shap)
+
+### feature importance locale
+waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
+with st.expander("Details of the decision", expanded=False):
+    st.pyplot(waterfall)
+    st.write("<span style='color:Crimson;'> Factors that expose the client to the risk of loan default </span>", unsafe_allow_html=True)
+    st.write("<span style='color:DodgerBlue;'> Criteria that increase the client's likelihood of loan repayment. </span>", unsafe_allow_html=True)
+
+###.............................................. Analyse shapely globale
+#feature importance globale
+summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
+with st.expander("Decision criteria of the algorithm"):
+    st.pyplot(summary_plot)
+    st.write('This graph illustrates the top 10 features that carry the most weight in all algorithmic decisions.')
+
+# ##............................................. Récuperation de 10 features les plus importantes
 #
 #
-# # ##########################################################################################################################
-# # ###                  Affichage des informations détaillée du client sélectionné                                        ###
-# # ##########################################################################################################################
-# # with st.expander("Detailed customer information :", expanded=False):
-# #     st.write("Here you can see the detailed information of the customer " + var_code)
-# #     st.write(pred_client.iloc[:,2:].T)
-# # ##########################################################################################################################
-# #
-#
-#
-# ##########################################################################################################################
-# ###                                                       Analyse shapely                                              ###
-# ##########################################################################################################################
-# df_clients_shap=df_clients.copy()
-# df_clients_shap.set_index('SK_ID_CURR', inplace = True)
-# df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
-# #st.write(df_clients_shap.head(2))
-# ### récupération des shap_values de notre échantillon
-# shap_values = explainer(df_clients_shap)
-#
-#
-#
-# ###....................................... Analyse shapely locale
-# ### index de l'ID client renseigné
-# idx_clients_shap = df_clients_shap.index.get_loc(int(var_code))
-# colors = ['green','red']
-# #st.write(idx_clients_shap)
-#
-# ### feature importance locale
-# waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
-# with st.expander("Details of the decision", expanded=False):
-#     st.pyplot(waterfall)
-#     st.write("<span style='color:Crimson;'> Factors that expose the client to the risk of loan default </span>", unsafe_allow_html=True)
-#     st.write("<span style='color:DodgerBlue;'> Criteria that increase the client's likelihood of loan repayment. </span>", unsafe_allow_html=True)
-#
-# ###.............................................. Analyse shapely globale
-# #feature importance globale
-# summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
-# with st.expander("Decision criteria of the algorithm"):
-#     st.pyplot(summary_plot)
-#     st.write('This graph illustrates the top 10 features that carry the most weight in all algorithmic decisions.')
-#
-# # ##............................................. Récuperation de 10 features les plus importantes
-# #
-# #
-# # feature_names = shap_values.feature_names
-# # shap_df = pd.DataFrame(shap_values.values, columns=feature_names)
-# # vals = np.abs(shap_df.iloc[idx_clients_shap].values)
-# # shap_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['col_name', 'feature_importance_vals'])
-# # shap_importance.sort_values(by=['feature_importance_vals'], ascending=False, inplace=True)
-# # top_ten = shap_importance['col_name'].head(20).tolist()#reset_index(drop=True)
-# # top_ten = pd.DataFrame(top_ten)
-# ##########################################################################################################################
-#
-#
-#
-# ##########################################################################################################################
-# ###                              Univariate Analysis & Client Positioning                                              ###
-# ##########################################################################################################################
-#
-#
-#
-#
-# with st.expander("More Analysis", expanded=True):
-#     st.write("<div id='shapley'><h6><span style='color:#0A1172;'>Analyse Client : "+var_code+"</h6></div></br>", unsafe_allow_html=True)
-#     with st.form("form1"):# = st.form(key="form")
-#         st.markdown("<div id='shapley'><h6>Univariate Analysis & Client Positioning</span></h6></div></br>", unsafe_allow_html=True)
-#         vars = ['EXT_SOURCE_MEAN', 'AMT_CREDIT', 'DAYS_BIRTH', 'INS_DPD_MEAN',
-#                'AMT_ANNUITY', 'POS_CNT_INSTALMENT_FUTURE_MEAN', 'AMT_GOODS_PRICE',
-#                'PREV_CNT_PAYMENT_MEAN','BUREAU_AMT_CREDIT_SUM_DEBT_MEAN', 'DAYS_EMPLOYED',
-#                'APPROVED_AMT_ANNUITY_MEAN', 'PREV_APP_CREDIT_PERC_MEAN',
-#                'DAYS_ID_PUBLISH', 'ACTIVE_DAYS_CREDIT_MEAN', 'INS_AMT_PAYMENT_MEAN', 'CODE_GENDER',
-#                'PREV_DAYS_LAST_DUE_1ST_VERSION_MEAN', 'DAYS_LAST_PHONE_CHANGE',
-#                'INS_DAYS_ENTRY_PAYMENT_MEAN', 'INS_DBD_MEAN', 'FLAG_OWN_CAR',
-#                'BUREAU_AMT_CREDIT_SUM_MEAN', 'INS_DAYS_INSTALMENT_MEAN','PREV_AMT_DOWN_PAYMENT_MEAN']
-#         col_selected = st.multiselect('Choose one or more features :', vars)#df_clients.columns)
-#         submit = st.form_submit_button(label="submit")
-#         with st.spinner('Loading data'):
-#                 if submit:
-#                     if (len(col_selected) == 0):
-#                         st.error('❌ Sélectionner au moins une variable')
-#                         st.stop()
-#                     elif (len(col_selected)>0):
-#                         #st.write(col_selected)
-#                         plot_frequency(df_clients,int(var_code),col_selected, nrow=len(col_selected), ncol=1)
-#
-#     with st.form("form2"):
-#         st.markdown("<div id='shapley'><h6>Bivariate analysis</h6></div></br>", unsafe_allow_html=True)
-#         # all_continuous_features = df_clients_shap.select_dtypes(exclude=['object','bool']).columns.to_list()
-#         # col_selected_top10 = [x for x in all_continuous_features if x in top_ten]
-#         col_selected2 = st.multiselect('Choose 2 features :', vars)
-#         # var_1 = st.selectbox('1st Feature :',top_ten)
-#         # list_2=top_ten.drop(top_ten[top_ten['col_name']==var_1].index)
-#         # var_2 = st.selectbox('2nd Feature :',list_2)
-#         submit2 = st.form_submit_button(label="submit")
-#         with st.spinner('Loading data'):
-#                  if submit2:
-#                      if (len(col_selected2) != 2 ):
-#                          st.error('❌ Sélectionner juste 2 variables')
-#                          st.stop()
-#                      elif (len(col_selected2) == 2):
-#                          scat_plot_px(df_clients, col_selected2[0], col_selected2[1], color="ypred1")#,title=titre)
-#                          #scat_plot=px.scatter(df_clients, col_selected2[0], col_selected2[1], color="TARGET",color_continuous_scale='rdylgn_r')#,title=titre)
-#                          # Ajout de l'individu i colorié en rouge
-#                          #scat_plot (pred_client, col_selected2[0], col_selected2[1], color="DodgerBlue")#,title=titre)
-#                          #st.plotly_chart(scat_plot, use_container_width='auto')
-#
-# ##########################################################################################################################
+# feature_names = shap_values.feature_names
+# shap_df = pd.DataFrame(shap_values.values, columns=feature_names)
+# vals = np.abs(shap_df.iloc[idx_clients_shap].values)
+# shap_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['col_name', 'feature_importance_vals'])
+# shap_importance.sort_values(by=['feature_importance_vals'], ascending=False, inplace=True)
+# top_ten = shap_importance['col_name'].head(20).tolist()#reset_index(drop=True)
+# top_ten = pd.DataFrame(top_ten)
+##########################################################################################################################
+
+
+
+##########################################################################################################################
+###                              Univariate Analysis & Client Positioning                                              ###
+##########################################################################################################################
+
+
+
+
+with st.expander("More Analysis", expanded=True):
+    st.write("<div id='shapley'><h6><span style='color:#0A1172;'>Analyse Client : "+var_code+"</h6></div></br>", unsafe_allow_html=True)
+    with st.form("form1"):# = st.form(key="form")
+        st.markdown("<div id='shapley'><h6>Univariate Analysis & Client Positioning</span></h6></div></br>", unsafe_allow_html=True)
+        vars = ['EXT_SOURCE_MEAN', 'AMT_CREDIT', 'DAYS_BIRTH', 'INS_DPD_MEAN',
+               'AMT_ANNUITY', 'POS_CNT_INSTALMENT_FUTURE_MEAN', 'AMT_GOODS_PRICE',
+               'PREV_CNT_PAYMENT_MEAN','BUREAU_AMT_CREDIT_SUM_DEBT_MEAN', 'DAYS_EMPLOYED',
+               'APPROVED_AMT_ANNUITY_MEAN', 'PREV_APP_CREDIT_PERC_MEAN',
+               'DAYS_ID_PUBLISH', 'ACTIVE_DAYS_CREDIT_MEAN', 'INS_AMT_PAYMENT_MEAN', 'CODE_GENDER',
+               'PREV_DAYS_LAST_DUE_1ST_VERSION_MEAN', 'DAYS_LAST_PHONE_CHANGE',
+               'INS_DAYS_ENTRY_PAYMENT_MEAN', 'INS_DBD_MEAN', 'FLAG_OWN_CAR',
+               'BUREAU_AMT_CREDIT_SUM_MEAN', 'INS_DAYS_INSTALMENT_MEAN','PREV_AMT_DOWN_PAYMENT_MEAN']
+        col_selected = st.multiselect('Choose one or more features :', vars)#df_clients.columns)
+        submit = st.form_submit_button(label="submit")
+        with st.spinner('Loading data'):
+                if submit:
+                    if (len(col_selected) == 0):
+                        st.error('❌ Sélectionner au moins une variable')
+                        st.stop()
+                    elif (len(col_selected)>0):
+                        #st.write(col_selected)
+                        plot_frequency(df_clients,int(var_code),col_selected, nrow=len(col_selected), ncol=1)
+
+    with st.form("form2"):
+        st.markdown("<div id='shapley'><h6>Bivariate analysis</h6></div></br>", unsafe_allow_html=True)
+        # all_continuous_features = df_clients_shap.select_dtypes(exclude=['object','bool']).columns.to_list()
+        # col_selected_top10 = [x for x in all_continuous_features if x in top_ten]
+        col_selected2 = st.multiselect('Choose 2 features :', vars)
+        # var_1 = st.selectbox('1st Feature :',top_ten)
+        # list_2=top_ten.drop(top_ten[top_ten['col_name']==var_1].index)
+        # var_2 = st.selectbox('2nd Feature :',list_2)
+        submit2 = st.form_submit_button(label="submit")
+        with st.spinner('Loading data'):
+                 if submit2:
+                     if (len(col_selected2) != 2 ):
+                         st.error('❌ Sélectionner juste 2 variables')
+                         st.stop()
+                     elif (len(col_selected2) == 2):
+                         scat_plot_px(df_clients, col_selected2[0], col_selected2[1], color="ypred1")#,title=titre)
+                         #scat_plot=px.scatter(df_clients, col_selected2[0], col_selected2[1], color="TARGET",color_continuous_scale='rdylgn_r')#,title=titre)
+                         # Ajout de l'individu i colorié en rouge
+                         #scat_plot (pred_client, col_selected2[0], col_selected2[1], color="DodgerBlue")#,title=titre)
+                         #st.plotly_chart(scat_plot, use_container_width='auto')
+
+##########################################################################################################################
