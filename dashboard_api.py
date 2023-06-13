@@ -161,7 +161,9 @@ df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
 
 ### chargement de l'explainer SHAP
 #explainer = joblib.load('explainer.sav')
-explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
+#explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
+with open('explainer_pkl.pkl', 'rb') as file:
+    explainer = pickle.load(file)
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 ###  Importer le modèle entrainé lightGBM
