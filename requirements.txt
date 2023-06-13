@@ -1,5 +1,5 @@
 Flask==2.3.2
-joblib==1.2.0
+joblib
 numpy==1.24.3
 pandas==1.4.4
 seaborn==0.11.2
