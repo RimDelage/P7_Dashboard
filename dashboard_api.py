@@ -159,9 +159,9 @@ df_clients = pd.read_csv('df_1000.csv')
 ### Nettoyage des colonnes du Dataframe
 df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
 
-### chargement de l'explainer SHAP
-explainer = joblib.load('explainer.sav')
-st.set_option('deprecation.showPyplotGlobalUse', False)
+# ### chargement de l'explainer SHAP
+# explainer = joblib.load('explainer.sav')
+# st.set_option('deprecation.showPyplotGlobalUse', False)
 
 ###  Importer le modèle entrainé lightGBM
 lgbm_clf = pickle.load(open('best_model_lgbm.pkl', 'rb'))
@@ -262,51 +262,51 @@ st.plotly_chart(fig, use_container_width=True)
 # ##########################################################################################################################
 #
 
-
-##########################################################################################################################
-###                                                       Analyse shapely                                              ###
-##########################################################################################################################
-df_clients_shap=df_clients.copy()
-df_clients_shap.set_index('SK_ID_CURR', inplace = True)
-df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
-#st.write(df_clients_shap.head(2))
-### récupération des shap_values de notre échantillon
-shap_values = explainer(df_clients_shap)
-
-
-
-###....................................... Analyse shapely locale
-### index de l'ID client renseigné
-idx_clients_shap = df_clients_shap.index.get_loc(int(var_code))
-colors = ['green','red']
-#st.write(idx_clients_shap)
-
-### feature importance locale
-waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
-with st.expander("Details of the decision", expanded=False):
-    st.pyplot(waterfall)
-    st.write("<span style='color:Crimson;'> Factors that expose the client to the risk of loan default </span>", unsafe_allow_html=True)
-    st.write("<span style='color:DodgerBlue;'> Criteria that increase the client's likelihood of loan repayment. </span>", unsafe_allow_html=True)
-
-###.............................................. Analyse shapely globale
-#feature importance globale
-summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
-with st.expander("Decision criteria of the algorithm"):
-    st.pyplot(summary_plot)
-    st.write('This graph illustrates the top 10 features that carry the most weight in all algorithmic decisions.')
-
-# ##............................................. Récuperation de 10 features les plus importantes
+#
+# ##########################################################################################################################
+# ###                                                       Analyse shapely                                              ###
+# ##########################################################################################################################
+# df_clients_shap=df_clients.copy()
+# df_clients_shap.set_index('SK_ID_CURR', inplace = True)
+# df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
+# #st.write(df_clients_shap.head(2))
+# ### récupération des shap_values de notre échantillon
+# shap_values = explainer(df_clients_shap)
 #
 #
-# feature_names = shap_values.feature_names
-# shap_df = pd.DataFrame(shap_values.values, columns=feature_names)
-# vals = np.abs(shap_df.iloc[idx_clients_shap].values)
-# shap_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['col_name', 'feature_importance_vals'])
-# shap_importance.sort_values(by=['feature_importance_vals'], ascending=False, inplace=True)
-# top_ten = shap_importance['col_name'].head(20).tolist()#reset_index(drop=True)
-# top_ten = pd.DataFrame(top_ten)
-##########################################################################################################################
-
+#
+# ###....................................... Analyse shapely locale
+# ### index de l'ID client renseigné
+# idx_clients_shap = df_clients_shap.index.get_loc(int(var_code))
+# colors = ['green','red']
+# #st.write(idx_clients_shap)
+#
+# ### feature importance locale
+# waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
+# with st.expander("Details of the decision", expanded=False):
+#     st.pyplot(waterfall)
+#     st.write("<span style='color:Crimson;'> Factors that expose the client to the risk of loan default </span>", unsafe_allow_html=True)
+#     st.write("<span style='color:DodgerBlue;'> Criteria that increase the client's likelihood of loan repayment. </span>", unsafe_allow_html=True)
+#
+# ###.............................................. Analyse shapely globale
+# #feature importance globale
+# summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
+# with st.expander("Decision criteria of the algorithm"):
+#     st.pyplot(summary_plot)
+#     st.write('This graph illustrates the top 10 features that carry the most weight in all algorithmic decisions.')
+#
+# # ##............................................. Récuperation de 10 features les plus importantes
+# #
+# #
+# # feature_names = shap_values.feature_names
+# # shap_df = pd.DataFrame(shap_values.values, columns=feature_names)
+# # vals = np.abs(shap_df.iloc[idx_clients_shap].values)
+# # shap_importance = pd.DataFrame(list(zip(feature_names, vals)), columns=['col_name', 'feature_importance_vals'])
+# # shap_importance.sort_values(by=['feature_importance_vals'], ascending=False, inplace=True)
+# # top_ten = shap_importance['col_name'].head(20).tolist()#reset_index(drop=True)
+# # top_ten = pd.DataFrame(top_ten)
+# ##########################################################################################################################
+#
 
 
 ##########################################################################################################################
