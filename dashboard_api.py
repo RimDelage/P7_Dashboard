@@ -161,7 +161,7 @@ df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
 
 ### chargement de l'explainer SHAP
 #explainer = joblib.load('explainer.sav')
-#explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
+explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 ###  Importer le modèle entrainé lightGBM
@@ -271,7 +271,7 @@ df_clients_shap.set_index('SK_ID_CURR', inplace = True)
 df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
 #st.write(df_clients_shap.head(2))
 ### récupération des shap_values de notre échantillon
-explainer = shap.Explainer(lgbm_clf, df_clients_shap, feature_names=df_clients_shap.columns)
+#explainer = shap.Explainer(lgbm_clf, df_clients_shap, feature_names=df_clients_shap.columns)
 shap_values = explainer(df_clients_shap)
 
 
