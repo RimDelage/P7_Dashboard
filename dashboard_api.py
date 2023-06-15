@@ -11,7 +11,7 @@ import plotly.express as px
 import shap
 import requests
 shap.initjs()
-
+st.set_option('deprecation.showPyplotGlobalUse', False)
 ##########################################################################################################################
 ###                                                 Titre                                                              ###
 ##########################################################################################################################
@@ -159,12 +159,12 @@ df_clients = pd.read_csv('df_1000.csv')
 ### Nettoyage des colonnes du Dataframe
 df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
 
-### chargement de l'explainer SHAP
-#explainer = joblib.load('explainer.sav')
-#explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
-with open('explainer_pkl.pkl', 'rb') as file:
-    explainer = pickle.load(file)
-st.set_option('deprecation.showPyplotGlobalUse', False)
+# ### chargement de l'explainer SHAP
+# explainer = joblib.load('explainer.sav')
+# explainer = pickle.load(open('explainer_pkl.pkl', 'rb'))
+# with open('explainer_pkl.pkl', 'rb') as file:
+#     explainer = pickle.load(file)
+
 
 ###  Importer le modèle entrainé lightGBM
 lgbm_clf = pickle.load(open('best_model_lgbm.pkl', 'rb'))
@@ -273,7 +273,8 @@ df_clients_shap.set_index('SK_ID_CURR', inplace = True)
 df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
 #st.write(df_clients_shap.head(2))
 ### récupération des shap_values de notre échantillon
-#explainer = shap.Explainer(lgbm_clf, df_clients_shap, feature_names=df_clients_shap.columns)
+explainer = shap.Explainer(lgbm_clf['lgbm'], df_clients_shap, feature_names=df_clients_shap.columns)
+#tree_explainer = shap.TreeExplainer(lgbm_clf['lgbm'])
 shap_values = explainer(df_clients_shap)
 
 
@@ -308,7 +309,8 @@ with st.expander("Decision criteria of the algorithm"):
 # shap_importance.sort_values(by=['feature_importance_vals'], ascending=False, inplace=True)
 # top_ten = shap_importance['col_name'].head(20).tolist()#reset_index(drop=True)
 # top_ten = pd.DataFrame(top_ten)
-##########################################################################################################################
+# st.write(top_ten)
+# #########################################################################################################################
 
 
 
