@@ -273,7 +273,8 @@ df_clients_shap.set_index('SK_ID_CURR', inplace = True)
 df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
 #st.write(df_clients_shap.head(2))
 ### récupération des shap_values de notre échantillon
-explainer = shap.Explainer(lgbm_clf['lgbm'], df_clients_shap, feature_names=df_clients_shap.columns, masker="bool")
+explainer = shap.Explainer(lgbm_clf['lgbm'], df_clients_shap, feature_names=df_clients_shap.columns)
+explainer.masker._last_mask = np.zeros(df_clients_shap.shape[1], dtype=np.bool_)
 #tree_explainer = shap.TreeExplainer(lgbm_clf['lgbm'])
 shap_values = explainer(df_clients_shap)
 
