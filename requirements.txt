@@ -1,6 +1,6 @@
 Flask==2.3.2
 joblib
-numpy==1.24.3
+numpy
 pandas==1.4.4
 seaborn==0.11.2
 matplotlib==3.5.2

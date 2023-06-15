@@ -273,10 +273,12 @@ df_clients_shap.set_index('SK_ID_CURR', inplace = True)
 df_clients_shap.drop(['TARGET','ypred1'], axis=1, inplace=True)
 #st.write(df_clients_shap.head(2))
 ### récupération des shap_values de notre échantillon
-explainer = shap.Explainer(lgbm_clf['lgbm'], df_clients_shap, feature_names=df_clients_shap.columns)
-explainer.masker._last_mask = np.zeros(df_clients_shap.shape[1], dtype=np.bool_)
-#tree_explainer = shap.TreeExplainer(lgbm_clf['lgbm'])
-shap_values = explainer(df_clients_shap)
+# explainer = shap.Explainer(lgbm_clf['lgbm'], df_clients_shap, feature_names=df_clients_shap.columns)
+# explainer.masker._last_mask = np.zeros(df_clients_shap.shape[1], dtype=np.bool_)
+# shap_values = explainer(df_clients_shap)
+
+tree_explainer = shap.TreeExplainer(lgbm_clf['lgbm'])
+tree_shap_values = tree_explainer.shap_values(df_clients_shap)
 
 
 
@@ -287,7 +289,11 @@ colors = ['green','red']
 #st.write(idx_clients_shap)
 
 ### feature importance locale
-waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
+#waterfall = shap.plots.waterfall(shap_values[idx_clients_shap])#,color=colors)
+waterfall = shap.plots._waterfall.waterfall_legacy(tree_explainer.expected_value[1],
+                                        tree_shap_values[1][idx_clients_shap],
+                                        feature_names = df_clients_shap.columns,
+                                        max_display = 20)
 with st.expander("Details of the decision", expanded=False):
     st.pyplot(waterfall)
     st.write("<span style='color:Crimson;'> Factors that expose the client to the risk of loan default </span>", unsafe_allow_html=True)
@@ -295,7 +301,9 @@ with st.expander("Details of the decision", expanded=False):
 
 ###.............................................. Analyse shapely globale
 #feature importance globale
-summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
+#summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
+summary_plot = shap.summary_plot(tree_shap_values,df_clients_shap, max_display=10)#,color=colors)
+
 with st.expander("Decision criteria of the algorithm"):
     st.pyplot(summary_plot)
     st.write('This graph illustrates the top 10 features that carry the most weight in all algorithmic decisions.')
