@@ -25,7 +25,7 @@ st.write('')
 ##########################################################################################################################
 ###                                                 Fonctions utilisées                                                ###
 ##########################################################################################################################
-### to reduce memory usage
+## to reduce memory usage
 # def reduce_mem_usage(df):
 #     """ iterate through all the columns of a dataframe and modify the data type
 #         to reduce memory usage.
@@ -63,7 +63,7 @@ st.write('')
 #     #print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) / start_mem))
 #
 #     return df
-#
+# #
 ###  Plot des variables pour analyse univarié
 def plot_frequency(df, client_id, vars_, nrow, ncol):
     colors = [ '#32CD32', 'red']
@@ -73,7 +73,7 @@ def plot_frequency(df, client_id, vars_, nrow, ncol):
 
     for i, feature in enumerate(vars_):
         ax = axes[i]
-        sns.histplot(data=df, x=feature, hue='TARGET', kde=True,palette=colors,ax=ax, binwidth=0.03 )
+        sns.histplot(data=df, x=feature, hue='TARGET', kde=True,palette=colors,ax=ax)
         #sns.displot(df,x=feature,hue='TARGET',kde=True,color=colors[i],ax=ax)
         ax.set_ylabel('Frequency plot', fontsize=16)
         ax.set_xlabel(feature, fontsize=16)
@@ -91,7 +91,7 @@ def plot_frequency(df, client_id, vars_, nrow, ncol):
     legend_elements = [plt.Line2D([0], [0], color=c, marker='', linestyle='-') for c in colors]
     fig.legend(legend_elements, legend_labels, loc='center left', bbox_to_anchor=(1, 0.5), fontsize=16)
     plt.tight_layout()
-    plt.show()
+    #plt.show()
     st.pyplot(fig, use_container_width=True)
 
 
@@ -157,7 +157,7 @@ def scat_plot_sns(df, var1, var2, color):
 #df_clients = reduce_mem_usage((pd.read_csv('df_1000.csv')))
 df_clients = pd.read_csv('df_1000.csv')
 ### Nettoyage des colonnes du Dataframe
-df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
+#df_clients  = df_clients.rename(columns = lambda x:re.sub(' ', '_', x))
 
 # ### chargement de l'explainer SHAP
 # explainer = joblib.load('explainer.sav')
@@ -301,7 +301,7 @@ with st.expander("Details of the decision", expanded=False):
 
 ###.............................................. Analyse shapely globale
 #feature importance globale
-#summary_plot = shap.summary_plot(shap_values, max_display=10,color=colors)
+#summary_plot = shap.summary_plot(shap_values, max_display=10)#,color=colors)
 summary_plot = shap.summary_plot(tree_shap_values,df_clients_shap, max_display=10)#,color=colors)
 
 with st.expander("Decision criteria of the algorithm"):
@@ -328,20 +328,19 @@ with st.expander("Decision criteria of the algorithm"):
 ##########################################################################################################################
 
 
-
+vars = ['EXT_SOURCE_MEAN', 'AMT_CREDIT', 'DAYS_BIRTH', 'INS_DPD_MEAN',
+       'AMT_ANNUITY', 'POS_CNT_INSTALMENT_FUTURE_MEAN', 'AMT_GOODS_PRICE',
+       'PREV_CNT_PAYMENT_MEAN','BUREAU_AMT_CREDIT_SUM_DEBT_MEAN', 'DAYS_EMPLOYED',
+       'APPROVED_AMT_ANNUITY_MEAN', 'PREV_APP_CREDIT_PERC_MEAN',
+       'DAYS_ID_PUBLISH', 'ACTIVE_DAYS_CREDIT_MEAN', 'INS_AMT_PAYMENT_MEAN', 'CODE_GENDER',
+       'PREV_DAYS_LAST_DUE_1ST_VERSION_MEAN', 'DAYS_LAST_PHONE_CHANGE',
+       'INS_DAYS_ENTRY_PAYMENT_MEAN', 'INS_DBD_MEAN', 'FLAG_OWN_CAR',
+       'BUREAU_AMT_CREDIT_SUM_MEAN', 'INS_DAYS_INSTALMENT_MEAN','PREV_AMT_DOWN_PAYMENT_MEAN']
 
 with st.expander("More Analysis", expanded=True):
     st.write("<div id='shapley'><h6><span style='color:#0A1172;'>Analyse Client : "+var_code+"</h6></div></br>", unsafe_allow_html=True)
     with st.form("form1"):# = st.form(key="form")
         st.markdown("<div id='shapley'><h6>Univariate Analysis & Client Positioning</span></h6></div></br>", unsafe_allow_html=True)
-        vars = ['EXT_SOURCE_MEAN', 'AMT_CREDIT', 'DAYS_BIRTH', 'INS_DPD_MEAN',
-               'AMT_ANNUITY', 'POS_CNT_INSTALMENT_FUTURE_MEAN', 'AMT_GOODS_PRICE',
-               'PREV_CNT_PAYMENT_MEAN','BUREAU_AMT_CREDIT_SUM_DEBT_MEAN', 'DAYS_EMPLOYED',
-               'APPROVED_AMT_ANNUITY_MEAN', 'PREV_APP_CREDIT_PERC_MEAN',
-               'DAYS_ID_PUBLISH', 'ACTIVE_DAYS_CREDIT_MEAN', 'INS_AMT_PAYMENT_MEAN', 'CODE_GENDER',
-               'PREV_DAYS_LAST_DUE_1ST_VERSION_MEAN', 'DAYS_LAST_PHONE_CHANGE',
-               'INS_DAYS_ENTRY_PAYMENT_MEAN', 'INS_DBD_MEAN', 'FLAG_OWN_CAR',
-               'BUREAU_AMT_CREDIT_SUM_MEAN', 'INS_DAYS_INSTALMENT_MEAN','PREV_AMT_DOWN_PAYMENT_MEAN']
         col_selected = st.multiselect('Choose one or more features :', vars)#df_clients.columns)
         submit = st.form_submit_button(label="submit")
         with st.spinner('Loading data'):
